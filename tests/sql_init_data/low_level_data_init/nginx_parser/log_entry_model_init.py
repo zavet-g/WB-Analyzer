@@ -7,7 +7,7 @@ from datetime import timedelta
 from sqlalchemy import insert
 from sqlalchemy.dialects.postgresql import Insert
 
-from apps.api.v1.models.log_entry_model import LogEntryModel
+from apps.api.v1.models.product_model import LogEntryModel
 
 
 def get_log_entry_model_init() -> list[Insert]:

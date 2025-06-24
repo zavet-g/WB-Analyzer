@@ -1,7 +1,7 @@
 import pytest
 
 from apps.api.v1.cruds.base_crud import BaseCrud
-from apps.api.v1.models.log_entry_model import LogEntryModel
+from apps.api.v1.models.product_model import LogEntryModel
 from tests.sql_init_data.base_data_tree import base_parser_tree
 
 

@@ -3,8 +3,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.v1.cruds.base_crud import BaseCrud
-from apps.api.v1.models.log_entry_model import LogEntryModel
-from apps.api.v1.schemas.log_entry_schema import GetLogEntryOutSchema
+from apps.api.v1.models.product_model import LogEntryModel
+from apps.api.v1.schemas.product_schema import GetLogEntryOutSchema
 from apps.auth.schemas.user_schema import UserSchema
 from apps.db.session import connector
 
