@@ -1,14 +1,11 @@
-from typing import Optional
-
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from typing import Optional
 from apps.api.v1.cruds.base_crud import BaseCrud
-from apps.api.v1.schemas.product_schema import ProductOutSchema
-from apps.db.session import get_pg_session
 from apps.models.product import ProductModel
-
+from apps.api.v1.schemas.product_schema import ProductOutSchema
+from apps.db.session import connector
 
 class ProductCrud(BaseCrud):
     async def get_products(
@@ -17,20 +14,9 @@ class ProductCrud(BaseCrud):
         min_rating: Optional[float] = None,
         min_reviews: Optional[int] = None,
         category: Optional[str] = None,
-        db: AsyncSession = Depends(get_pg_session),
+        db: AsyncSession = Depends(connector.get_pg_session),
     ) -> list[ProductOutSchema]:
-        """Получает список товаров с фильтрацией.
-
-        Args:
-            min_price: Минимальная цена товара.
-            min_rating: Минимальный рейтинг товара.
-            min_reviews: Минимальное количество отзывов.
-            category: Категория товара.
-            db: Асинхронная сессия базы данных.
-
-        Returns:
-            list[ProductOutSchema]: Список товаров в формате Pydantic-схемы.
-        """
+        """Получает список товаров с фильтрацией."""
         query = select(ProductModel).order_by(ProductModel.id)
         if min_price is not None:
             query = query.where(ProductModel.price >= min_price)

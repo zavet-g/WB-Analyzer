@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from apps.api.v1.cruds.product_crud import product_crud_obj
 from apps.api.v1.schemas.product_schema import ProductOutSchema
-from apps.db.session import get_pg_session
+from apps.db.session import connector
 
 router = APIRouter()
 
@@ -16,20 +16,9 @@ async def get_products(
     min_rating: Optional[float] = Query(None, description="Минимальный рейтинг"),
     min_reviews: Optional[int] = Query(None, description="Минимальное количество отзывов"),
     category: Optional[str] = Query(None, description="Категория товаров"),
-    db: AsyncSession = Depends(get_pg_session),
+    db: AsyncSession = Depends(connector.get_pg_session),
 ) -> list[ProductOutSchema]:
-    """Получает список товаров с фильтрацией.
-
-    Args:
-        min_price: Минимальная цена товара.
-        min_rating: Минимальный рейтинг товара.
-        min_reviews: Минимальное количество отзывов.
-        category: Категория товара.
-        db: Асинхронная сессия базы данных.
-
-    Returns:
-        list[ProductOutSchema]: Список товаров.
-    """
+    """Получает список товаров с фильтрацией."""
     return await product_crud_obj.get_products(
         min_price=min_price,
         min_rating=min_rating,
