@@ -1,40 +1,49 @@
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
+import pytest
 
-from apps.db.annotated_fields import dt_utcnow
-from apps.db.annotated_fields import dt_with_tz
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from apps.api.v1.models.product_model import ProductModel
 from apps.db.base_db_class import BaseDBModel
+from apps.db.session import PGEngineConnector
+from tests.sql_init_data.base_data_tree import base_data_tree  # type: ignore
 
 
-class TestGroupByFields:
-    """Тестирование базового класса БД.
+@pytest.fixture
+async def db_session():
+    """Фикстура для создания тестовой сессии.
 
     Запуск:
+        pytest tests/db/test_base_db_class.py::db_session -s
+    """
+    connector = PGEngineConnector()
+    async with connector.get_pg_session() as session:
+        yield session
+
+@pytest.mark.asyncio
+class TestBaseDBClass:
+    """Тестирование базового класса БД.
+
+    Запуск всех тестов класса:
         pytest tests/db/test_base_db_class.py -s
     """
 
-    def test_group_by_fields(self):
-        class TestModel1(BaseDBModel):
-            __tablename__ = 'test_1'
-            __table_args__: dict[str, str] | tuple = ({'schema': 'nginx_parser_schema'},)
-            id: Mapped[int] = mapped_column(
-                primary_key=True,
-            )
-            create_date: Mapped[dt_with_tz] = mapped_column()
+    async def test_group_by_fields(self, db_session: AsyncSession, base_data_tree):
+        """Тестируем метод group_by_fields для ProductModel.
 
-        result = TestModel1.group_by_fields()
+        Запуск:
+            pytest tests/db/test_base_db_class.py::TestBaseDBClass::test_group_by_fields -s
+        """
+        result = ProductModel.group_by_fields()
+        assert len(result) == 6  # Поля: id, name, price, discount_price, rating, reviews_count
+        assert str(result[0]) == 'products.id'  # Проверяем первое поле
 
-        assert len(result) == 2
+    async def test_jsonb_build_object(self, db_session: AsyncSession, base_data_tree):
+        """Тестируем метод jsonb_build_object для ProductModel.
 
-    def test_json_build_object(self):
-        class TestModel2(BaseDBModel):
-            __tablename__ = 'test_2'
-            __table_args__: dict[str, str] | tuple = ({'schema': 'nginx_parser_schema'},)
-            id: Mapped[int] = mapped_column(
-                primary_key=True,
-            )
-            create_date: Mapped[dt_utcnow] = mapped_column()
-
-        result = TestModel2.jsonb_build_object()
-
-        assert len(result) == 4
+        Запуск:
+            pytest tests/db/test_base_db_class.py::TestBaseDBClass::test_jsonb_build_object -s
+        """
+        result = ProductModel.jsonb_build_object()
+        assert len(result) == 12  # 6 полей * 2 (ключ + значение в JSONB)
+        assert str(result[0]) == "'id'"  # Проверяем первый ключ
+        assert str(result[1]) == 'products.id'  # Проверяем первое значение

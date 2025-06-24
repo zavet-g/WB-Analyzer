@@ -1,13 +1,35 @@
-from tests.sql_init_data.low_level_data_init.nginx_parser.log_entry_model_init import (
-    get_log_entry_model_init,
-)
-from tests.sql_init_data.low_level_data_init.nginx_parser.server_model_init import (
-    get_server_model_init,
-)
+import pytest
+from sqlalchemy import insert
+from sqlalchemy.ext.asyncio import AsyncSession
 
-__all__ = [
-    'base_parser_tree',
-]
+from apps.api.v1.models.product_model import ProductModel
 
+@pytest.fixture
+async def base_data_tree(db_session: AsyncSession):
+    """Фикстура для инициализации тестовых данных для ProductModel.
 
-base_parser_tree = get_server_model_init() + get_log_entry_model_init()
+    Запуск:
+        pytest tests/sql_init_data/base_data_tree.py::base_data_tree -s
+    """
+    test_data = [
+        {
+            "id": 1,
+            "name": "Test Laptop 1",
+            "price": 50000,
+            "discount_price": 45000,
+            "rating": 4.5,
+            "reviews_count": 100,
+            "category": "ноутбуки"
+        },
+        {
+            "id": 2,
+            "name": "Test Laptop 2",
+            "price": 60000,
+            "discount_price": 55000,
+            "rating": 4.0,
+            "reviews_count": 50,
+            "category": "ноутбуки"
+        }
+    ]
+    await db_session.execute(insert(ProductModel), test_data)
+    await db_session.commit()
