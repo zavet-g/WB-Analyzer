@@ -1,6 +1,9 @@
 from typing import Optional
+
 from pydantic import BaseModel
+
 from apps.api.v1.schemas.base_schema import BaseSchema
+
 
 class ProductOutSchema(BaseSchema):
     id: int
