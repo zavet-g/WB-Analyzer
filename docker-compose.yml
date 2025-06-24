@@ -21,7 +21,7 @@ services:
       - np_postgres_vol:/data/pgdata
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Tr7869z9}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     env_file:
       - .env
 
