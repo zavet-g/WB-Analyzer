@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.api.v1.cruds.log_entry_crud import log_entry_crud_obj
+from apps.api.v1.cruds.product_crud import log_entry_crud_obj
 from apps.api.v1.schemas.product_schema import GetLogEntryOutSchema
 from apps.auth.dependencies.auth_dependency import auth_dependency
 from apps.auth.schemas.user_schema import UserSchema

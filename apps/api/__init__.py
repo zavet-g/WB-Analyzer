@@ -1,13 +1,13 @@
 from fastapi import APIRouter
 
-from apps.api.v1.handlers import log_entry_handler
+from apps.api.v1.handlers import product_heandler
 from apps.api.v1.handlers import server_handler
 from apps.utils import health_check
 
 router = APIRouter()
 
 router.include_router(
-    log_entry_handler.router,
+    product_heandler.router,
     prefix='/api',
     tags=['api'],
 )
