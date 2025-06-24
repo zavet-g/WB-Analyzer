@@ -1,6 +1,10 @@
-from fastapi import APIRouter, Depends, Query
 from typing import Optional
+
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import Query
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from apps.api.v1.cruds.product_crud import product_crud_obj
 from apps.api.v1.schemas.product_schema import ProductOutSchema
 from apps.db.session import connector
