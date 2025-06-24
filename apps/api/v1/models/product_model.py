@@ -1,10 +1,6 @@
-from datetime import datetime
-
-from sqlalchemy import DateTime
-from sqlalchemy import ForeignKey
+from sqlalchemy import Float
 from sqlalchemy import Integer
 from sqlalchemy import String
-from sqlalchemy import Float
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
