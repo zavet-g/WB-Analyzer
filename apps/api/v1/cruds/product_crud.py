@@ -1,35 +1,49 @@
+from typing import Optional
+
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.v1.cruds.base_crud import BaseCrud
-from apps.api.v1.models.product_model import LogEntryModel
-from apps.api.v1.schemas.product_schema import GetLogEntryOutSchema
-from apps.auth.schemas.user_schema import UserSchema
-from apps.db.session import connector
+from apps.api.v1.schemas.product_schema import ProductOutSchema
+from apps.db.session import get_pg_session
+from apps.models.product import ProductModel
 
 
-class LogEntryCrud(BaseCrud):
-    async def get_entry_logs(
+class ProductCrud(BaseCrud):
+    async def get_products(
         self,
-        user: UserSchema,
-        db: AsyncSession = Depends(connector.get_pg_session),
-    ) -> list[GetLogEntryOutSchema]:
-        """Получаем все записи логов из таблицы EmailLogModel.
+        min_price: Optional[int] = None,
+        min_rating: Optional[float] = None,
+        min_reviews: Optional[int] = None,
+        category: Optional[str] = None,
+        db: AsyncSession = Depends(get_pg_session),
+    ) -> list[ProductOutSchema]:
+        """Получает список товаров с фильтрацией.
 
         Args:
-            user (UserSchema): Пользователь (не используется для фильтрации).
-            db (AsyncSession): Асинхронная сессия базы данных.
+            min_price: Минимальная цена товара.
+            min_rating: Минимальный рейтинг товара.
+            min_reviews: Минимальное количество отзывов.
+            category: Категория товара.
+            db: Асинхронная сессия базы данных.
 
         Returns:
-            list[GetLogEntryOutSchema]: Список всех записей логов в формате Pydantic-схемы.
+            list[ProductOutSchema]: Список товаров в формате Pydantic-схемы.
         """
-        stmt = select(LogEntryModel).order_by(LogEntryModel.timestamp)
+        query = select(ProductModel).order_by(ProductModel.id)
+        if min_price is not None:
+            query = query.where(ProductModel.price >= min_price)
+        if min_rating is not None:
+            query = query.where(ProductModel.rating >= min_rating)
+        if min_reviews is not None:
+            query = query.where(ProductModel.reviews_count >= min_reviews)
+        if category is not None:
+            query = query.where(ProductModel.category == category)
 
-        res = await db.execute(stmt)
-        entries = res.scalars().all()
+        result = await db.execute(query)
+        entries = result.scalars().all()
 
-        return [GetLogEntryOutSchema.model_validate(entry) for entry in entries]
+        return [ProductOutSchema.model_validate(entry) for entry in entries]
 
-
-log_entry_crud_obj = LogEntryCrud(LogEntryModel)
+product_crud_obj = ProductCrud(ProductModel)
