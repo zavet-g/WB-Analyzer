@@ -1,11 +1,14 @@
+from typing import Optional
+
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Optional
+
 from apps.api.v1.cruds.base_crud import BaseCrud
-from apps.models.product import ProductModel
+from apps.api.v1.models.product_model import ProductModel
 from apps.api.v1.schemas.product_schema import ProductOutSchema
 from apps.db.session import connector
+
 
 class ProductCrud(BaseCrud):
     async def get_products(

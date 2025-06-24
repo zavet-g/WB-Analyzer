@@ -1,5 +1,4 @@
 from typing import Any
-
 from dotenv import find_dotenv
 from dotenv import load_dotenv
 from pydantic import AnyHttpUrl
@@ -7,10 +6,8 @@ from pydantic import PostgresDsn
 from pydantic import ValidationError
 from pydantic import model_validator
 from pydantic_settings import BaseSettings
-
 from apps.utils.enums.env_enum import EnvEnum
 from apps.utils.enums.log_level_enum import LogLevelEnum
-
 
 class Settings(BaseSettings):
     """Класс конфигурации. Содержит все переменные, которые мы используем в проекте."""
@@ -41,6 +38,7 @@ class Settings(BaseSettings):
 
         sqlalchemy_db_uri = sqlalchemy_db_uri.replace('%', '%%')
         data.update({'SQLALCHEMY_DATABASE_URI': sqlalchemy_db_uri})
+        data.update({'TEST_SQLALCHEMY_DATABASE_URI': sqlalchemy_db_uri})  # Если тестовая база та же
         return data
 
     @model_validator(mode='before')
@@ -59,12 +57,12 @@ class Settings(BaseSettings):
         return data
 
     # Общие настройки
-    ENVIRONMENT: EnvEnum
+    ENVIRONMENT: EnvEnum = EnvEnum.DEVELOPMENT
     LOG_LEVEL: LogLevelEnum = LogLevelEnum.INFO
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
-    PROJECT_NAME: str = 'base_fastapi'
+    PROJECT_NAME: str = "wb-analyzer"
 
-    # JWT
+    # JWT (не используется в текущем проекте, но оставлено для совместимости)
     JWT_SECRET_KEY: str = 'dWrVziPa1VyvEFcYX1PAluU8cuICcaiH'
     JWT_ALGORITHM: str = 'HS256'
     JWT_AUTH_HEADER_PREFIX: str = 'Bearer'
@@ -73,13 +71,12 @@ class Settings(BaseSettings):
     # База данных
     POSTGRES_HOST: str = 'localhost'
     POSTGRES_PORT: int | str = 5432
-    POSTGRES_USER: str | None = 'user'
-    POSTGRES_PASSWORD: str | None = ''
-    POSTGRES_DB: str | None = ''
+    POSTGRES_USER: str | None = 'postgres'
+    POSTGRES_PASSWORD: str | None = 'postgres'
+    POSTGRES_DB: str | None = 'wb_analyzer'
     SQLALCHEMY_DATABASE_URI: str
-    TEST_SQLALCHEMY_DATABASE_URI: str = ''
-    ALCHEMY_POLL_SIZE: int = 10  # Размер пула соединений алхимии
-    ALCHEMY_OVERFLOW_POOL_SIZE: int = 20  # Размер очереди соединений
-
+    TEST_SQLALCHEMY_DATABASE_URI: str
+    ALCHEMY_POLL_SIZE: int = 10
+    ALCHEMY_OVERFLOW_POOL_SIZE: int = 20
 
 SETTINGS = Settings()
