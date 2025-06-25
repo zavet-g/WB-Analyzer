@@ -1,5 +1,6 @@
 import pytest
 
+from sqlalchemy import delete
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,6 +15,9 @@ async def db_session():
     connector = PGEngineConnector()
     async with connector.get_pg_session() as session:
         yield session
+        # Очистка данных после теста
+        await session.execute(delete(ProductModel))
+        await session.commit()
 
 @pytest.fixture
 async def db_init_pre_build(db_session: AsyncSession):
@@ -44,7 +48,6 @@ async def db_init_pre_build(db_session: AsyncSession):
 @pytest.mark.asyncio
 class TestBaseCrud:
     """Тестируем базовый CRUD."""
-
     CRUD = BaseCrud(ProductModel)
 
     async def test_get(
@@ -66,3 +69,22 @@ class TestBaseCrud:
         """Тестируем получение списка записей."""
         objs = await self.CRUD.get_list(db=db_session)
         assert len(list(objs)) == 2
+
+    async def test_add_product(
+        self,
+        db_session: AsyncSession
+    ):
+        """Тестируем добавление записи."""
+        product_data = {
+            "name": "Test Product 3",
+            "price": 30000,
+            "discount_price": 27000,
+            "rating": 4.8,
+            "reviews_count": 200,
+            "category": "смартфоны"
+        }
+        obj = await self.CRUD.add_product(product_data=product_data, db=db_session)
+        assert obj is not None
+        assert obj.name == "Test Product 3"
+        assert obj.price == 30000
+        assert obj.category == "смартфоны"

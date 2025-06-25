@@ -1,6 +1,7 @@
 import pytest
 
 from fastapi.testclient import TestClient
+from sqlalchemy import delete
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,6 +16,9 @@ async def db_session():
     connector = PGEngineConnector()
     async with connector.get_pg_session() as session:
         yield session
+        # Очистка данных после теста
+        await session.execute(delete(ProductModel))
+        await session.commit()
 
 @pytest.fixture
 async def db_init_pre_build(db_session: AsyncSession):
@@ -43,11 +47,11 @@ async def db_init_pre_build(db_session: AsyncSession):
     await db_session.commit()
 
 @pytest.mark.asyncio
-class TestGetProducts:
+class TestProductHandler:
     """Тестируем обработчик получения товаров.
 
     Запуск всех тестов класса:
-        pytest tests/api/test_product_handler.py -s
+        pytest tests/api/handlers/test_product_handler.py -s
     """
 
     @pytest.fixture
@@ -60,12 +64,12 @@ class TestGetProducts:
         client: TestClient,
         db_init_pre_build
     ):
-        """Тестируем endpoint /api/get_products.
+        """Тестируем endpoint /api/products.
 
         Запуск:
-            pytest tests/api/test_product_handler.py::TestGetProducts::test_get_products -s
+            pytest tests/api/handlers/test_product_handler.py::TestProductHandler::test_get_products -s
         """
-        response = client.get("/api/get_products")
+        response = client.get("/api/products")
         assert response.status_code == 200
         data = response.json()
         assert isinstance(data, list)
@@ -79,15 +83,30 @@ class TestGetProducts:
         client: TestClient,
         db_init_pre_build
     ):
-        """Тестируем endpoint /api/get_products с фильтрами.
+        """Тестируем endpoint /api/products с фильтрами.
 
         Запуск:
-            pytest tests/api/test_product_handler.py::TestGetProducts::test_get_products_with_filters -s
+            pytest tests/api/handlers/test_product_handler.py::TestProductHandler::test_get_products_with_filters -s
         """
-        response = client.get("/api/get_products?min_price=55000&min_rating=4.2")
+        response = client.get("/api/products?min_price=55000&min_rating=4.2")
         assert response.status_code == 200
         data = response.json()
         assert isinstance(data, list)
         assert len(data) == 1
         assert data[0]["id"] == 1
         assert data[0]["name"] == "Test Laptop 1"
+
+    async def test_parse_products(
+        self,
+        client: TestClient,
+        mocker
+    ):
+        """Тестируем endpoint /api/parse.
+
+        Запуск:
+            pytest tests/api/handlers/test_product_handler.py::TestProductHandler::test_parse_products -s
+        """
+        mocker.patch("apps.api.v1.wildberries_parser.WildberriesParser.parse_products")
+        response = client.post("/api/parse", json={"category": "ноутбуки"})
+        assert response.status_code == 200
+        assert response.json() == {"message": "Parsing started for category: ноутбуки"}
