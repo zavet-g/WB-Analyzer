@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   db:
     container_name: wb_analyzer_db
@@ -13,20 +12,23 @@ services:
       - postgres_data:/var/lib/postgresql/data
     env_file:
       - .env
-
   app:
     container_name: wb_analyzer_app
     build:
       context: .
       dockerfile: Dockerfile
+      target: dev
     depends_on:
       - db
     environment:
       - ENV_FILE=.env
+      - PYTHONPATH=/app
     ports:
       - "8000:8000"
+    volumes:
+      - .:/app
     env_file:
       - .env
-
+    command: bash -c "poetry run uvicorn apps.api.v1.main:app --host 0.0.0.0 --port 8000 --reload"
 volumes:
-  postgres_data_vol:
+  postgres_data:
