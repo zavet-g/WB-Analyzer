@@ -7,8 +7,9 @@ router = APIRouter()
 
 router.include_router(
     product_handler.router,
-    prefix='/api',
-    tags=['api'],
 )
 
-router.include_router(health_check.health_check_router, tags=['health_check'])
+router.include_router(
+    health_check.health_check_router,
+    tags=['health_check'],
+)

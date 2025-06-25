@@ -41,7 +41,6 @@ class Settings(BaseSettings):
 
         sqlalchemy_db_uri = sqlalchemy_db_uri.replace('%', '%%')
         data.update({'SQLALCHEMY_DATABASE_URI': sqlalchemy_db_uri})
-        data.update({'TEST_SQLALCHEMY_DATABASE_URI': sqlalchemy_db_uri})  # Если тестовая база та же
         return data
 
     @model_validator(mode='before')
@@ -60,25 +59,18 @@ class Settings(BaseSettings):
         return data
 
     # Общие настройки
-    ENVIRONMENT: EnvEnum = EnvEnum.DEVELOPMENT
+    ENVIRONMENT: EnvEnum = EnvEnum.PROD
     LOG_LEVEL: LogLevelEnum = LogLevelEnum.INFO
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
     PROJECT_NAME: str = "wb-analyzer"
 
-    # JWT (не используется в текущем проекте, но оставлено для совместимости)
-    JWT_SECRET_KEY: str = 'dWrVziPa1VyvEFcYX1PAluU8cuICcaiH'
-    JWT_ALGORITHM: str = 'HS256'
-    JWT_AUTH_HEADER_PREFIX: str = 'Bearer'
-    JWT_TOKEN_TTL: int = 30  # 5 min
-
     # База данных
-    POSTGRES_HOST: str = 'localhost'
+    POSTGRES_HOST: str = 'db'
     POSTGRES_PORT: int | str = 5432
     POSTGRES_USER: str | None = 'postgres'
     POSTGRES_PASSWORD: str | None = 'postgres'
     POSTGRES_DB: str | None = 'wb_analyzer'
     SQLALCHEMY_DATABASE_URI: str
-    TEST_SQLALCHEMY_DATABASE_URI: str
     ALCHEMY_POLL_SIZE: int = 10
     ALCHEMY_OVERFLOW_POOL_SIZE: int = 20
 
