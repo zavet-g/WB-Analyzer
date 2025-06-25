@@ -4,30 +4,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.v1.models.product_model import ProductModel
 from apps.db.base_db_class import BaseDBModel
-from apps.db.session import PGEngineConnector
 from tests.sql_init_data.base_data_tree import base_data_tree  # type: ignore
 
-
-@pytest.fixture
-async def db_session():
-    """Фикстура для создания тестовой сессии.
-
-    Запуск:
-        pytest tests/db/test_base_db_class.py::db_session -s
-    """
-    connector = PGEngineConnector()
-    async with connector.get_pg_session() as session:
-        yield session
 
 @pytest.mark.asyncio
 class TestBaseDBClass:
     """Тестирование базового класса БД.
 
-    Запуск всех тестов класса:
+    Запуск всех тестов:
         pytest tests/db/test_base_db_class.py -s
     """
 
-    async def test_group_by_fields(self, db_session: AsyncSession, base_data_tree):
+    async def test_group_by_fields(self, session: AsyncSession, base_data_tree):
         """Тестируем метод group_by_fields для ProductModel.
 
         Запуск:
@@ -37,7 +25,7 @@ class TestBaseDBClass:
         assert len(result) == 6  # Поля: id, name, price, discount_price, rating, reviews_count
         assert str(result[0]) == 'products.id'  # Проверяем первое поле
 
-    async def test_jsonb_build_object(self, db_session: AsyncSession, base_data_tree):
+    async def test_jsonb_build_object(self, session: AsyncSession, base_data_tree):
         """Тестируем метод jsonb_build_object для ProductModel.
 
         Запуск:

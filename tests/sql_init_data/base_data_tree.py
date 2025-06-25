@@ -1,11 +1,10 @@
 import pytest
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from apps.api.v1.models.product_model import ProductModel
 
 @pytest.fixture
-async def base_data_tree(db_session: AsyncSession):
+async def base_data_tree(session: AsyncSession):
     """Фикстура для инициализации тестовых данных для ProductModel.
 
     Запуск:
@@ -31,5 +30,5 @@ async def base_data_tree(db_session: AsyncSession):
             "category": "ноутбуки"
         }
     ]
-    await db_session.execute(insert(ProductModel), test_data)
-    await db_session.commit()
+    await session.execute(insert(ProductModel), test_data)
+    await session.commit()
