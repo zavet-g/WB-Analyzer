@@ -1,4 +1,5 @@
 from typing import Any
+
 from dotenv import find_dotenv
 from dotenv import load_dotenv
 from pydantic import AnyHttpUrl
@@ -6,8 +7,10 @@ from pydantic import PostgresDsn
 from pydantic import ValidationError
 from pydantic import model_validator
 from pydantic_settings import BaseSettings
+
 from apps.utils.enums.env_enum import EnvEnum
 from apps.utils.enums.log_level_enum import LogLevelEnum
+
 
 class Settings(BaseSettings):
     """Класс конфигурации. Содержит все переменные, которые мы используем в проекте."""
