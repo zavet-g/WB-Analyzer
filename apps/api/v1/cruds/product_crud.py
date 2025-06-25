@@ -32,7 +32,18 @@ class ProductCrud(BaseCrud):
 
         result = await db.execute(query)
         entries = result.scalars().all()
-
         return [ProductOutSchema.model_validate(entry) for entry in entries]
+
+    async def add_product(
+        self,
+        product_data: dict,
+        db: AsyncSession = Depends(connector.get_pg_session),
+    ) -> ProductOutSchema:
+        """Добавляет товар в базу."""
+        db_product = ProductModel(**product_data)
+        db.add(db_product)
+        await db.commit()
+        await db.refresh(db_product)
+        return ProductOutSchema.model_validate(db_product)
 
 product_crud_obj = ProductCrud(ProductModel)

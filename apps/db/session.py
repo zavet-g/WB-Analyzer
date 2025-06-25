@@ -12,7 +12,6 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from apps.settings import SETTINGS
-from apps.utils.enums.env_enum import EnvEnum
 
 
 class PGEngineConnector:
@@ -25,20 +24,13 @@ class PGEngineConnector:
     sql_alchemy_uri: str
     engine_dict: ClassVar[dict[str, AsyncEngine]] = {}
 
-    def __init__(self, sql_alchemy_uri: str | None = None):
+    def __init__(self, sql_alchemy_uri: str = SETTINGS.SQLALCHEMY_DATABASE_URI):
         """Инициализируем объект коннектора.
 
         Args:
-            sql_alchemy_uri: str - строка подключения пг
+            sql_alchemy_uri: строка подключения пг
         """
-
-        if sql_alchemy_uri:
-            self.sql_alchemy_uri = sql_alchemy_uri
-        else:
-            if SETTINGS.ENVIRONMENT == EnvEnum.PYTEST:
-                self.sql_alchemy_uri = SETTINGS.TEST_SQLALCHEMY_DATABASE_URI
-            else:
-                self.sql_alchemy_uri = SETTINGS.SQLALCHEMY_DATABASE_URI
+        self.sql_alchemy_uri = sql_alchemy_uri
 
     @classmethod
     def get_pg_engine(cls, sql_alchemy_uri: str) -> AsyncEngine:
@@ -47,7 +39,6 @@ class PGEngineConnector:
         Returns:
             AsyncEngine
         """
-
         if engine := cls.engine_dict.get(sql_alchemy_uri):
             return engine
 
@@ -57,15 +48,12 @@ class PGEngineConnector:
             max_overflow=SETTINGS.ALCHEMY_OVERFLOW_POOL_SIZE,
             pool_pre_ping=True,
             json_serializer=lambda x: json.dumps(x) if not isinstance(x, str) else x,
-            # echo=True,
         )
         cls.engine_dict[sql_alchemy_uri] = engine
-
         return engine
 
     def get_session_maker(self) -> async_sessionmaker[AsyncSession]:
         """Получение объекта AsyncSessionMaker."""
-
         return async_sessionmaker(
             self.get_pg_engine(sql_alchemy_uri=self.sql_alchemy_uri),
             expire_on_commit=False,
@@ -73,9 +61,7 @@ class PGEngineConnector:
 
     async def get_pg_session(self) -> AsyncGenerator[AsyncSession, None]:
         """Получение сессии."""
-
         session_maker = self.get_session_maker()
-
         async with session_maker() as session:
             yield session
 
@@ -86,12 +72,9 @@ class PGEngineConnector:
         from app.db.session import connector
         async with connector.get_pg_session_cm() as db:
             obj = await raw_history_CRUD.create(db=db, obj_in=body)
-
         """
         session_maker = self.get_session_maker()
-
         async with session_maker() as session:
             yield session
-
 
 connector = PGEngineConnector()
