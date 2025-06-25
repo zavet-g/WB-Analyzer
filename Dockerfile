@@ -1,32 +1,41 @@
 # syntax=docker.io/docker/dockerfile:1.7-labs
-FROM python:3.11-alpine AS base-image
+FROM python:3.12-slim AS base-image
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=off \
-    POETRY_HOME="/usr/local/bin/poetry" \
+    POETRY_HOME="/opt/poetry" \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     POETRY_NO_INTERACTION=1 \
-    POETRY_VERSION=2.0 \
-    PROJECT_PATH="/src"
+    POETRY_VERSION=1.8.3 \
+    PROJECT_PATH="/app"
 ENV PATH="$POETRY_HOME/bin:$PATH"
 RUN mkdir $PROJECT_PATH
-RUN apk --no-cache add curl gcc musl-dev libffi-dev
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    gcc \
+    libc-dev \
+    libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Установка Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
 ##############################################################
 # Образ для разработки
 FROM base-image AS dev
 ENV PRODUCTION=False
-COPY --exclude=poetry.lock --exclude=.venv ./ $PROJECT_PATH
+COPY . $PROJECT_PATH
 WORKDIR $PROJECT_PATH
-RUN pip install --no-cache-dir poetry=="$POETRY_VERSION" && poetry install
-CMD [".venv/bin/uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "3000"]
-#CMD ["sleep", "350000"]
+RUN poetry install
+EXPOSE 8000
+CMD [".venv/bin/uvicorn", "apps.api.v1.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
 
 ##############################################################
-# Образ для production: не ставятся dev зависимости, uvicorn запускается без hot reload
+# Образ для production
 FROM base-image AS prod
 ENV PRODUCTION=True
-COPY --exclude=poetry.lock --exclude=.venv ./ $PROJECT_PATH
+COPY . $PROJECT_PATH
 WORKDIR $PROJECT_PATH
-RUN pip install --no-cache-dir poetry=="$POETRY_VERSION" && poetry install 
-CMD [".venv/bin/uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "3000"]
+RUN poetry install --no-dev
+EXPOSE 8000
+CMD [".venv/bin/uvicorn", "apps.api.v1.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,30 +1,32 @@
+version: '3.8'
 services:
-
-  # np_app:
-  #   container_name: np_app
-  #   build:
-  #     context: .
-  #   ports:
-  #     - 3000:3000
-  #   volumes:
-  #     - ./app:/app/app
-  #     - ./tasks:/app/tasks
-  #   env_file:
-  #     - .env
-
-  np_postgres:
-    container_name: np_postgres
+  db:
+    container_name: wb_analyzer_db
     image: postgres:15.1
-    ports:
-      - 5432:5432
-    volumes:
-      - np_postgres_vol:/data/pgdata
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-wb_analyzer}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  app:
+    container_name: wb_analyzer_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      - ENV_FILE=.env
+    ports:
+      - "8000:8000"
     env_file:
       - .env
 
 volumes:
-  np_postgres_vol:
-  
+  postgres_data_vol:
