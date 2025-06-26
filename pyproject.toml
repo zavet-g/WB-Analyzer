@@ -6,10 +6,10 @@
    package-mode = false
 
    [tool.poetry.dependencies]
-   python = "^3.11"
+   python = "^3.13"
    asyncpg = "0.30.0"
    fastapi = { extras = ["all"], version = "0.115.6" }
-   uvicorn = { extras = ["standard"], version = "0.32.0" }
+   uvicorn = { extras = ["standard"], version = "0.34.3" }
    sqlalchemy = "2.0.36"
    alembic = "1.13.3"
    orjson = "3.10.13"
@@ -20,6 +20,8 @@
    PyJWT = "2.10.1"
    python-dotenv = "1.0.1"
    simple-print = "2.2.5"
+   aiohttp = "^3.9.5"
+   beautifulsoup4 = "^4.12.3"
 
    [tool.poetry.group.dev.dependencies]
    pytest = "8.3.4"
@@ -37,7 +39,7 @@
    build-backend = "poetry.core.masonry.api"
 
    [tool.mypy]
-   python_version = "3.11"
+   python_version = "3.13"
    disable_error_code = ["import-untyped"]
 
    [tool.pytest.ini_options]
