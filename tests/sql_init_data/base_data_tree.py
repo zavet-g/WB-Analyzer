@@ -1,7 +1,10 @@
 import pytest
+
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from apps.api.v1.models.product_model import ProductModel
+
 
 @pytest.fixture
 async def base_data_tree(session: AsyncSession):

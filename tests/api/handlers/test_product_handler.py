@@ -107,6 +107,6 @@ class TestProductHandler:
             pytest tests/api/handlers/test_product_handler.py::TestProductHandler::test_parse_products -s
         """
         mocker.patch("apps.api.v1.wildberries_parser.WildberriesParser.parse_products")
-        response = client.post("/api/parse", json={"category": "ноутбуки"})
+        response = client.post("/api/parse?category=ноутбуки")
         assert response.status_code == 200
         assert response.json() == {"message": "Parsing started for category: ноутбуки"}

@@ -40,7 +40,7 @@
 
    [tool.mypy]
    python_version = "3.13"
-   disable_error_code = ["import-untyped"]
+   ignore_missing_imports = true
 
    [tool.pytest.ini_options]
    asyncio_mode = "auto"

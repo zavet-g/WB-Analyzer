@@ -1,4 +1,3 @@
-from typing import Optional
 
 from fastapi import Depends
 from sqlalchemy import select
@@ -13,10 +12,10 @@ from apps.db.session import connector
 class ProductCrud(BaseCrud):
     async def get_products(
         self,
-        min_price: Optional[int] = None,
-        min_rating: Optional[float] = None,
-        min_reviews: Optional[int] = None,
-        category: Optional[str] = None,
+        min_price: int | None = None,
+        min_rating: float | None = None,
+        min_reviews: int | None = None,
+        category: str | None = None,
         db: AsyncSession = Depends(connector.get_pg_session),
     ) -> list[ProductOutSchema]:
         """Получает список товаров с фильтрацией."""

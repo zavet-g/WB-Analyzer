@@ -1,4 +1,3 @@
-from typing import Optional
 
 from fastapi import APIRouter
 from fastapi import BackgroundTasks
@@ -18,10 +17,10 @@ router = APIRouter(prefix="/api", tags=["products"])
     response_model=list[ProductOutSchema],
 )
 async def get_products(
-    min_price: Optional[float] = Query(None, description="Минимальная цена"),
-    min_rating: Optional[float] = Query(None, description="Минимальный рейтинг"),
-    min_reviews: Optional[int] = Query(None, description="Минимальное количество отзывов"),
-    category: Optional[str] = Query(None, description="Категория товаров"),
+    min_price: float | None = Query(None, description="Минимальная цена"),
+    min_rating: float | None = Query(None, description="Минимальный рейтинг"),
+    min_reviews: int | None = Query(None, description="Минимальное количество отзывов"),
+    category: str | None = Query(None, description="Категория товаров"),
     db: AsyncSession = Depends(connector.get_pg_session),
 ) -> list[ProductOutSchema]:
     """Получает список товаров с фильтрацией."""

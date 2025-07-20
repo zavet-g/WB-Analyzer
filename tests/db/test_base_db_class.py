@@ -3,8 +3,6 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.v1.models.product_model import ProductModel
-from apps.db.base_db_class import BaseDBModel
-from tests.sql_init_data.base_data_tree import base_data_tree  # type: ignore
 
 
 @pytest.mark.asyncio

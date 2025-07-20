@@ -44,7 +44,7 @@ COPY . $PROJECT_PATH
 RUN chown -R $(whoami):$(whoami) /app
 RUN chmod -R u+rwX /app/.venv
 EXPOSE 8000
-CMD ["poetry", "run", "uvicorn", "apps.api.v1.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["poetry", "run", "uvicorn", "apps.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
 
 ############################################################
 # Образ для production
@@ -64,4 +64,4 @@ COPY . $PROJECT_PATH
 RUN chown -R $(whoami):$(whoami) /app
 RUN chmod -R u+rwX /app/.venv
 EXPOSE 8000
-CMD ["poetry", "run", "uvicorn", "apps.api.v1.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["poetry", "run", "uvicorn", "apps.main:app", "--host", "0.0.0.0", "--port", "8000"]

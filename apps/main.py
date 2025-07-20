@@ -19,6 +19,7 @@ from apps.api import router as api_router
 from apps.settings import SETTINGS
 from apps.utils.enums.env_enum import EnvEnum
 
+
 async def init_logger() -> None:
     """Метод инициализации логеров."""
     logger.remove()

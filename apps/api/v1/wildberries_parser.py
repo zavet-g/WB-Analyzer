@@ -14,7 +14,11 @@ class WildberriesParser:
     async def parse_products(category: str, session: AsyncSession) -> None:
         """Парсинг товаров с Wildberries по категории."""
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/91.0.4472.124 Safari/537.36"
+            )
         }
         try:
             async with aiohttp.ClientSession() as client:
@@ -26,11 +30,12 @@ class WildberriesParser:
                     html = await response.text()
 
                 soup = BeautifulSoup(html, "html.parser")
-                products = soup.find_all("div", class_="product-card")
-                
+                # Обновленные селекторы для Wildberries
+                products = soup.find_all("div", class_="product-card__wrapper")
+
                 for product in products[:10]:  # Ограничиваем 10 товарами для теста
                     try:
-                        name_elem = product.find("span", class_="goods-name")
+                        name_elem = product.find("span", class_="product-card__name")
                         price_elem = product.find("span", class_="price__lower-price")
                         discount_price_elem = product.find("span", class_="price__old-price")
                         rating_elem = product.find("span", class_="product-card__rating")
